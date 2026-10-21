@@ -8,6 +8,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'solecito-cafe-2025'
+# Ruta absoluta para la base de datos
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'solecito.db')
 
 
@@ -50,8 +51,7 @@ def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
-    c.execute('DROP TABLE IF EXISTS productos')
-    
+    # Crear tablas si no existen
     c.execute('''CREATE TABLE IF NOT EXISTS productos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT NOT NULL,
@@ -70,42 +70,45 @@ def init_db():
         detalle TEXT NOT NULL,
         fecha TEXT NOT NULL)''')
 
-    ejemplos = [
-        ('Tradicional', 65.0, 'Latte', 'Jarabe casero', 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&q=80'),
-        ('Vainilla / Vainilla Light', 75.0, 'Latte', 'Jarabe casero', 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=80'),
-        ('Mazapán', 75.0, 'Latte', '', 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&q=80'),
-        ('Nutella', 75.0, 'Latte', '', 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=80'),
-        ('Moka Mexicano', 75.0, 'Latte', 'Chocolate Abuelita', 'https://cdn.phototourl.com/member/2026-10-19-bddc185b-cde3-424b-b1cd-3c476625a615.jpg'),
-        ('Spanish', 75.0, 'Latte', 'Lechera', 'https://cdn.phototourl.com/member/2026-10-19-b5088241-0674-4852-9df3-3c4d2601e16e.jpg'),
-        ('Canelita', 75.0, 'Latte', 'Miel, Canela', 'https://cdn.phototourl.com/member/2026-10-19-5ddf6133-7c16-4705-b55a-3de867062a14.jpg'),
-        ('Dorado', 80.0, 'Latte', 'Miel, Canela, Vainilla', 'https://cdn.phototourl.com/member/2026-10-19-e82936a2-81f2-4f79-8509-c00030d7b261.jpg'),
-        ('Tiramisú Latte', 75.0, 'Latte', 'Latte tradicional con Cold Foam de Tiramisú', 'https://cdn.phototourl.com/member/2026-10-19-954c38e7-3cd3-4f63-b23d-dbdee40ca71e.jpg'),
-        ('Frutal', 80.0, 'Latte', 'Fresa / Mango / Arándano / Frutos rojos', 'https://cdn.phototourl.com/member/2026-10-19-e32054d0-3da8-48c8-a1bb-c95fcd7d34d7.jpg'),
+    # Verificar si hay productos. Si no hay, insertarlos.
+    c.execute('SELECT COUNT(*) FROM productos')
+    if c.fetchone()[0] == 0:
+        ejemplos = [
+            ('Tradicional', 65.0, 'Latte', 'Jarabe casero', 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&q=80'),
+            ('Vainilla / Vainilla Light', 75.0, 'Latte', 'Jarabe casero', 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=80'),
+            ('Mazapán', 75.0, 'Latte', '', 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&q=80'),
+            ('Nutella', 75.0, 'Latte', '', 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=80'),
+            ('Moka Mexicano', 75.0, 'Latte', 'Chocolate Abuelita', 'https://cdn.phototourl.com/member/2026-10-19-bddc185b-cde3-424b-b1cd-3c476625a615.jpg'),
+            ('Spanish', 75.0, 'Latte', 'Lechera', 'https://cdn.phototourl.com/member/2026-10-19-b5088241-0674-4852-9df3-3c4d2601e16e.jpg'),
+            ('Canelita', 75.0, 'Latte', 'Miel, Canela', 'https://cdn.phototourl.com/member/2026-10-19-5ddf6133-7c16-4705-b55a-3de867062a14.jpg'),
+            ('Dorado', 80.0, 'Latte', 'Miel, Canela, Vainilla', 'https://cdn.phototourl.com/member/2026-10-19-e82936a2-81f2-4f79-8509-c00030d7b261.jpg'),
+            ('Tiramisú Latte', 75.0, 'Latte', 'Latte tradicional con Cold Foam de Tiramisú', 'https://cdn.phototourl.com/member/2026-10-19-954c38e7-3cd3-4f63-b23d-dbdee40ca71e.jpg'),
+            ('Frutal', 80.0, 'Latte', 'Fresa / Mango / Arándano / Frutos rojos', 'https://cdn.phototourl.com/member/2026-10-19-e32054d0-3da8-48c8-a1bb-c95fcd7d34d7.jpg'),
 
-        ('Tradicional', 70.0, 'Matcha', 'Con Cold Foam de Vainilla', 'https://cdn.phototourl.com/member/2026-10-19-9a1cea84-70aa-459d-a336-d0cb38bcd321.jpg'),  
-        ('Tiramisú', 80.0, 'Matcha', 'Matcha tradicional con Cold Foam de Tiramisú', 'https://cdn.phototourl.com/member/2026-10-19-35930a22-3ac1-4f42-b139-1ed4e3fe1c5d.jpg'),
-        ('Frutal (Fresita)', 85.0, 'Matcha', 'Fresa / Mango / Arándano / Frutos rojos', 'https://cdn.phototourl.com/member/2026-10-20-5b24f9fd-55b8-4c9c-95c7-05fd16e8ecd8.jpg'),
-        ('Pink Tres Leches', 90.0, 'Matcha', 'Fresa, leche condensada y evaporada', 'https://cdn.phototourl.com/member/2026-10-20-8cabfc43-e7b1-4232-9443-b69d9a142155.jpg'),
+            ('Tradicional', 70.0, 'Matcha', 'Con Cold Foam de Vainilla', 'https://cdn.phototourl.com/member/2026-10-19-9a1cea84-70aa-459d-a336-d0cb38bcd321.jpg'),  
+            ('Tiramisú', 80.0, 'Matcha', 'Matcha tradicional con Cold Foam de Tiramisú', 'https://cdn.phototourl.com/member/2026-10-19-35930a22-3ac1-4f42-b139-1ed4e3fe1c5d.jpg'),
+            ('Frutal (Fresita)', 85.0, 'Matcha', 'Fresa / Mango / Arándano / Frutos rojos', 'https://cdn.phototourl.com/member/2026-10-20-5b24f9fd-55b8-4c9c-95c7-05fd16e8ecd8.jpg'),
+            ('Pink Tres Leches', 90.0, 'Matcha', 'Fresa, leche condensada y evaporada', 'https://cdn.phototourl.com/member/2026-10-20-8cabfc43-e7b1-4232-9443-b69d9a142155.jpg'),
 
-        ('Ixli', 65.0, 'Tisana', 'Kiwi, Manzana, Fresa, Arándano', 'https://cdn.phototourl.com/member/2026-10-20-ac3b1966-dab7-4c1e-b886-ced7824f8a84.jpg'),
-        ('Jacotepec', 65.0, 'Tisana', 'Mora Azul, Manzana, Fresa, Arándano', 'https://cdn.phototourl.com/member/2026-10-19-af2d4659-1bee-49db-883c-8ff94c128156.jpg'),
+            ('Ixli', 65.0, 'Tisana', 'Kiwi, Manzana, Fresa, Arándano', 'https://cdn.phototourl.com/member/2026-10-20-ac3b1966-dab7-4c1e-b886-ced7824f8a84.jpg'),
+            ('Jacotepec', 65.0, 'Tisana', 'Mora Azul, Manzana, Fresa, Arándano', 'https://cdn.phototourl.com/member/2026-10-19-af2d4659-1bee-49db-883c-8ff94c128156.jpg'),
 
-        ('Doppio', 40.0, 'Espresso', 'Espresso Doble', 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=600&q=80'),
-        ('Americano', 50.0, 'Espresso', 'Espresso con agua', 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=600&q=80'),
+            ('Doppio', 40.0, 'Espresso', 'Espresso Doble', 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=600&q=80'),
+            ('Americano', 50.0, 'Espresso', 'Espresso con agua', 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=600&q=80'),
 
-        ('Golden Milk Latte', 65.0, 'Golden', 'Leche dorada (cúrcuma)', 'https://cdn.phototourl.com/member/2026-10-19-b5e6deb5-ff60-41f6-a71b-6c11ff9a0b32.jpg'),
-        ('Golden Te', 55.0, 'Golden', 'Té dorado', 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&q=80'),
-        ('Affogato Lotus', 85.0, 'Golden', 'Helado con espresso y Lotus', 'https://cdn.phototourl.com/member/2026-10-20-6b8a8297-35ec-4ea8-9144-db94c59e871d.jpg'),
+            ('Golden Milk Latte', 65.0, 'Golden', 'Leche dorada (cúrcuma)', 'https://cdn.phototourl.com/member/2026-10-19-b5e6deb5-ff60-41f6-a71b-6c11ff9a0b32.jpg'),
+            ('Golden Te', 55.0, 'Golden', 'Té dorado', 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&q=80'),
+            ('Affogato Lotus', 85.0, 'Golden', 'Helado con espresso y Lotus', 'https://cdn.phototourl.com/member/2026-10-20-6b8a8297-35ec-4ea8-9144-db94c59e871d.jpg'),
 
-        ('Croissant', 35.0, 'Desayunos', 'Sencillo / Cheesy', 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&q=80'),
-        ('Bagel', 35.0, 'Desayunos', 'Sencillo / Cheesy', 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&q=80'),
-        ('Sandwich de Desayuno', 65.0, 'Desayunos', 'Croissant, Tocino, Huevo y Queso', 'https://cdn.phototourl.com/member/2026-10-19-097ae370-a35f-4bcd-a00f-249eb1d00cba.jpg'),
-    ]
-    
-    c.executemany(
-        'INSERT INTO productos (nombre, precio, categoria, descripcion, imagen) VALUES (?, ?, ?, ?, ?)',
-        ejemplos
-    )
+            ('Croissant', 35.0, 'Desayunos', 'Sencillo / Cheesy', 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&q=80'),
+            ('Bagel', 35.0, 'Desayunos', 'Sencillo / Cheesy', 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&q=80'),
+            ('Sandwich de Desayuno', 65.0, 'Desayunos', 'Croissant, Tocino, Huevo y Queso', 'https://cdn.phototourl.com/member/2026-10-19-097ae370-a35f-4bcd-a00f-249eb1d00cba.jpg'),
+        ]
+        
+        c.executemany(
+            'INSERT INTO productos (nombre, precio, categoria, descripcion, imagen) VALUES (?, ?, ?, ?, ?)',
+            ejemplos
+        )
     
     conn.commit()
     conn.close()
@@ -447,10 +450,13 @@ footer .copy { opacity: 0.5; font-size: 0.78rem; margin-top: 1rem; padding-top: 
 .fullscreen-gracias { position: fixed; inset: 0; overflow: hidden; z-index: 500; background: #0A0805; }
 .fullscreen-gracias .imagen-fondo {
     position: absolute; inset: 0;
-    background-size: cover; background-position: center;
+    background-size: contain; /* Imagen completa */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #0A0805;
     opacity: 0;
-    filter: brightness(0.2) blur(12px);
-    transform: scale(1.08);
+    filter: brightness(1) blur(0);
+    transform: scale(1);
     animation: revelarLento 3.5s ease-out 0.3s forwards;
 }
 
@@ -1020,7 +1026,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (audio) {
         audio.volume = 0.35;
-        audio.currentTime = 51; // Preparado en el segundo 51
+        audio.currentTime = 54; // Preparado en el segundo 54
         
         // Intentar reproducir automáticamente
         const playPromise = audio.play();
@@ -1205,8 +1211,11 @@ def agradecimientos():
 # ============================================================
 # MAIN
 # ============================================================
+# En Render, la app se ejecuta con gunicorn (o similar), no con app.run().
+# Sin embargo, dejamos init_db() aquí para que se ejecute al importar el módulo.
+init_db()
+
 if __name__ == '__main__':
-    init_db()
     print('=' * 55)
     print('    SOLECITO CAFÉ — Servidor Flask')
     print('  🌐  http://127.0.0.1:5000')
