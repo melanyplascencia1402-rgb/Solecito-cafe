@@ -8,7 +8,6 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'solecito-cafe-2025'
-# Ruta absoluta para la base de datos
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'solecito.db')
 
 
@@ -70,7 +69,7 @@ def init_db():
         detalle TEXT NOT NULL,
         fecha TEXT NOT NULL)''')
 
-    # Verificar si hay productos. Si no hay, insertarlos.
+    # Si no hay productos, insertarlos. Si ya hay, no borra nada.
     c.execute('SELECT COUNT(*) FROM productos')
     if c.fetchone()[0] == 0:
         ejemplos = [
