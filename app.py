@@ -50,28 +50,13 @@ def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
-    # Crear tablas si no existen
-    c.execute('''CREATE TABLE IF NOT EXISTS productos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        precio REAL NOT NULL,
-        categoria TEXT NOT NULL,
-        descripcion TEXT DEFAULT '',
-        imagen TEXT DEFAULT '')''')
+    c.execute('CREATE TABLE IF NOT EXISTS productos (id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT NOT NULL, precio REAL NOT NULL, categoria TEXT NOT NULL, descripcion TEXT DEFAULT \'\', imagen TEXT DEFAULT \'\')')
         
-    c.execute('''CREATE TABLE IF NOT EXISTS pedidos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        cliente TEXT NOT NULL,
-        telefono TEXT DEFAULT '',
-        direccion TEXT DEFAULT '',
-        notas TEXT DEFAULT '',
-        total REAL NOT NULL,
-        detalle TEXT NOT NULL,
-        fecha TEXT NOT NULL)''')
+    c.execute('CREATE TABLE IF NOT EXISTS pedidos (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT NOT NULL, telefono TEXT DEFAULT \'\', direccion TEXT DEFAULT \'\', notas TEXT DEFAULT \'\', total REAL NOT NULL, detalle TEXT NOT NULL, fecha TEXT NOT NULL)')
 
-    # Si no hay productos, insertarlos. Si ya hay, no borra nada.
     c.execute('SELECT COUNT(*) FROM productos')
     if c.fetchone()[0] == 0:
+        # AQUÍ ESTÁN LAS IMÁGENES EXACTAS DE TU CÓDIGO ORIGINAL
         ejemplos = [
             ('Tradicional', 65.0, 'Latte', 'Jarabe casero', 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&q=80'),
             ('Vainilla / Vainilla Light', 75.0, 'Latte', 'Jarabe casero', 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=80'),
@@ -972,12 +957,10 @@ def agradecimientos_html(imagen_url, musica_url):
 </head>
 <body>
 
-<!-- Reproductor oculto con autoplay -->
 <audio id="audio-fondo" loop preload="auto" autoplay>
     <source src=\"""" + audio_src + """\" type="audio/mpeg">
 </audio>
 
-<!-- Botón de música bonito (por si el autoplay falla) -->
 <div class="btn-musica" id="btn-musica" onclick="toggleMusica()">
     <span class="icono" id="icono">🎵</span>
     <span id="texto-btn">Reproducir música</span>
@@ -1027,17 +1010,14 @@ document.addEventListener('DOMContentLoaded', () => {
         audio.volume = 0.35;
         audio.currentTime = 54; // Preparado en el segundo 54
         
-        // Intentar reproducir automáticamente
         const playPromise = audio.play();
         
         if (playPromise !== undefined) {
             playPromise.then(() => {
-                // ✅ Se reprodujo automáticamente
                 icono.textContent = '🔊';
                 texto.textContent = 'Pausar música';
                 btn.style.background = 'rgba(245, 195, 106, 0.95)';
             }).catch(() => {
-                // ❌ El navegador bloqueó el autoplay
                 console.log("Autoplay bloqueado por el navegador. Se requiere clic del usuario.");
                 icono.textContent = '🎵';
                 texto.textContent = 'Reproducir música';
@@ -1210,8 +1190,6 @@ def agradecimientos():
 # ============================================================
 # MAIN
 # ============================================================
-# En Render, la app se ejecuta con gunicorn (o similar), no con app.run().
-# Sin embargo, dejamos init_db() aquí para que se ejecute al importar el módulo.
 init_db()
 
 if __name__ == '__main__':
